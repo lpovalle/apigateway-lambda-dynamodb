@@ -1,0 +1,18 @@
+
+Resources:
+  dynamodbTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - 
+          AttributeName: Number
+          AttributeType: N
+      ProvisionedThroughput:
+        "ReadCapacityUnits" : 5
+        "WriteCapacityUnits" : 5
+      KeySchema:
+        - 
+          AttributeName: Number
+          KeyType: HASH
+
+      TableName: Numbers

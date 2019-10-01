@@ -1,0 +1,26 @@
+Resources:
+  iamstack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://luis-templates.s3-us-west-2.amazonaws.com/iam-stack.yml
+
+  lambdastack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://luis-templates.s3-us-west-2.amazonaws.com/lambda-stack.yml
+      Parameters:
+          lambdaRole: !GetAtt iamstack.Outputs.lambdaRoleLuis
+
+  dynamodbstack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://luis-templates.s3-us-west-2.amazonaws.com/dynamodb-stack.yml
+
+  APIgatewaystack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://luis-templates.s3-us-west-2.amazonaws.com/APIgateway-stack.yml
+      Parameters: 
+        GETLambdaFunctionARN: !GetAtt lambdastack.Outputs.lambdaFunctionRead
+        POSTLambdaFunctionARN: !GetAtt lambdastack.Outputs.lambdaFunctionWrite
+        lambdaRoleLuis: !GetAtt iamstack.Outputs.lambdaRoleLuis

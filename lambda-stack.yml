@@ -1,0 +1,37 @@
+Parameters:
+  lambdaRole:
+    Type: String
+
+Resources:
+  lambdaFunctionWrite:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: PostFunction-luis
+      Handler: postfunction.handler
+      MemorySize: 128
+      Role: 
+        Ref: lambdaRole
+      Runtime: nodejs10.x
+      Timeout:  25
+      Code:
+        S3Bucket: luis-templates
+        S3Key: postfunction.zip
+
+  lambdaFunctionRead:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: GetFunction-luis
+      Handler: getfunction.handler
+      MemorySize: 128
+      Role:
+        Ref: lambdaRole
+      Runtime: nodejs10.x
+      Timeout:  25
+      Code:
+        S3Bucket: luis-templates
+        S3Key: getfunction.zip
+Outputs:
+  lambdaFunctionWrite:
+    Value: !GetAtt lambdaFunctionWrite.Arn
+  lambdaFunctionRead:
+    Value: !GetAtt lambdaFunctionRead.Arn

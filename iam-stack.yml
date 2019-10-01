@@ -1,0 +1,81 @@
+Resources:
+  lambdaRoleLuis: 
+    Type: "AWS::IAM::Role"
+    Properties: 
+      RoleName: "LambdaRoleLuis"
+      AssumeRolePolicyDocument: 
+        Statement: 
+          - Effect: "Allow"
+            Principal: 
+              Service: 
+                - "ec2.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+          - Effect: "Allow"
+            Principal: 
+                Service: 
+                  - "lambda.amazonaws.com"
+                  - "apigateway.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+
+      Policies:
+        - PolicyName: "LambdaPolicyLuis"
+          PolicyDocument: 
+            Statement: 
+              - Effect: "Allow"
+                Sid: "VisualEditor0"
+                Action: "s3:*"
+                Resource: "*"
+              - Effect: "Allow"
+                Sid: "VisualEditor1"
+                Resource: "*"
+                Action: 
+                - "dynamodb:*"       
+                - "iam:GetRole"
+                - "iam:ListRoles"
+                - "lambda:CreateFunction"
+                - "lambda:ListFunctions"
+                - "lambda:ListEventSourceMappings"
+                - "lambda:CreateEventSourceMapping"
+                - "lambda:DeleteEventSourceMapping"
+                - "lambda:GetFunctionConfiguration"
+                - "lambda:DeleteFunction"
+                - "lambda:InvokeFunction"
+              - Effect: "Allow"
+                Sid: "VisualEditor2"
+                Action: 
+                - "logs:CreateLogGroup"
+                - "logs:CreateLogStream"
+                - "logs:PutLogEvents"
+                Resource: "*"
+              - Effect: "Allow"
+                Sid: "VisualEditor3"
+                Action: 
+                - "logs:CreateLogGroup"
+                - "logs:CreateLogStream"
+                - "logs:PutLogEvents"
+                - "logs:DescribeLogStreams"
+                Resource: "arn:aws:logs:*:*:*"
+              - Effect: "Allow"
+                Sid: "VisualEditor4"
+                Action: 
+                - "s3:GetObjectAcl"
+                - "s3:GetObject"
+                Resource: "arn:aws:s3:::luis-templates/*"
+              - Effect: Allow
+                Sid: "VisualEditor5"
+                Action:
+                  - xray:PutTelemetryRecords
+                  - xray:PutTraceSegments
+                Resource: "*"
+              - Effect: Allow
+                Sid: "VisualEditor6"
+                Action:
+                  - apigateway:*
+                  - iam:PassRole
+                Resource: "*"
+
+Outputs:
+  lambdaRoleLuis:
+    Value: !GetAtt lambdaRoleLuis.Arn

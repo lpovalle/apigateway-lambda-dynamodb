@@ -1,0 +1,75 @@
+Parameters:
+  GETLambdaFunctionARN:
+    Type: String
+  POSTLambdaFunctionARN:
+    Type: String
+  lambdaRoleLuis:
+    Type: String
+
+Resources:
+  ApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties: 
+      EndpointConfiguration: 
+        Types:
+          - REGIONAL
+      Name: LuisApiGateway
+
+  ApiResources:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+        - ApiGateway
+        - RootResourceId
+      PathPart: numero
+      RestApiId:
+        Ref: ApiGateway
+
+  PostNumberMethod:
+    Type: AWS::ApiGateway::Method
+    Properties: 
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration: 
+          ConnectionType: INTERNET
+          Credentials: 
+            Ref: lambdaRoleLuis
+          IntegrationHttpMethod: POST
+          PassthroughBehavior: WHEN_NO_MATCH
+          TimeoutInMillis: 29000
+          Type: AWS_PROXY
+          Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${POSTLambdaFunctionARN}/invocations
+      ResourceId:
+        Ref: ApiResources
+      RestApiId: 
+        Ref: ApiGateway
+
+  GetNumberMethod:
+    Type: AWS::ApiGateway::Method
+    Properties: 
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration: 
+          ConnectionType: INTERNET
+          Credentials: 
+            Ref: lambdaRoleLuis
+          PassthroughBehavior: WHEN_NO_MATCH
+          IntegrationHttpMethod: POST
+          TimeoutInMillis: 29000
+          Type: AWS_PROXY
+          Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GETLambdaFunctionARN}/invocations
+      ResourceId:
+        Ref: ApiResources
+      RestApiId: 
+        Ref: ApiGateway
+
+  ApiEnviroment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - PostNumberMethod
+      - GetNumberMethod
+    Properties: 
+      RestApiId:
+        Ref: ApiGateway
+      StageName: test
